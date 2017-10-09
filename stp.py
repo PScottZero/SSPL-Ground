@@ -108,8 +108,8 @@ class STPGround:
         self.longitude.set("77 02 W")
         self.gas1.set("77%")
         self.gas2.set("42%")
-        self.temperature.set("22C")
-        self.altitude.set("439ft")
+        self.temperature.set("22\u00b0C")
+        self.altitude.set("107m")
         self.graph.create_line(30, 200, 310, -50, 450, 100, fill="red", smooth=True)
         self.graph.create_oval(445, 95, 455, 105, fill="red")
 
