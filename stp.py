@@ -4,6 +4,28 @@
 # 24 September 2017
 from tkinter import *
 
+# color themes for GUI
+
+# grey theme
+color_bg = "#6B6B6B"
+color_fg = "#9A9A9A"
+color_font = "#00007F"
+
+# blue theme
+# color_bg = "#367189"
+# color_fg = "#729bac"
+# color_font = "#00007F"
+
+# red theme
+# color_bg = "#934C4C"
+# color_fg = "#A86F6F"
+# color_font = "#c1c1c1"
+
+# space theme
+# color_bg = "#5B669F"
+# color_fg = "#8C93BB"
+# color_font = "#5151CC"
+
 
 # builds GUI elements
 class STPGround:
@@ -12,16 +34,16 @@ class STPGround:
     def __init__(self, master):
 
         # initializes upper and lower frames
-        self.upperFrame = Frame(master, bg="grey")
+        self.upperFrame = Frame(master, bg=color_bg)
         self.upperFrame.pack()
-        self.middleFrame = Frame(master, bg="grey")
+        self.middleFrame = Frame(master, bg=color_bg)
         self.middleFrame.pack(anchor="w", padx=20, pady=(30, 0))
-        self.lowerFrame = Frame(master, bg="grey")
+        self.lowerFrame = Frame(master, bg=color_bg)
         self.lowerFrame.pack(anchor="w", padx=20)
 
         # initializes logo for upper frame
         self.logo = PhotoImage(file="logo.png")
-        self.logoLabel = Label(self.upperFrame, image=self.logo, borderwidth=0, highlightthickness=0, bg="grey")
+        self.logoLabel = Label(self.upperFrame, image=self.logo, borderwidth=0, highlightthickness=0, bg=color_bg)
         self.logoLabel.image = self.logo
         self.logoLabel.pack()
 
@@ -35,11 +57,11 @@ class STPGround:
 
         # gas 1 concentration cell
         self.gas1 = StringVar()
-        self.widget_creator(self.gas1, "Gas 1 Concentration", 0, 1, 0)
+        self.widget_creator(self.gas1, "Gas 1 Concentration:", 0, 1, 0)
 
         # gas 2 concentration cell
         self.gas2 = StringVar()
-        self.widget_creator(self.gas2, "Gas 2 Concentration", 20, 1, 1)
+        self.widget_creator(self.gas2, "Gas 2 Concentration:", 20, 1, 1)
 
         # temperature cell
         self.temperature = StringVar()
@@ -85,6 +107,7 @@ class STPGround:
         self.graph.create_text(590, 215, text="120")
         self.graph.create_text(630, 215, text="sec")
 
+        self.graph.create_text(600, 15, text="Altitude Graph", font=("Arial", 12))
         self.graph.pack()
 
         # sets dummy data
@@ -92,14 +115,14 @@ class STPGround:
 
     # creates data cells
     def widget_creator(self, variable, text, padding, row, col):
-        widget_frame = Frame(self.middleFrame, bg="#c1c1c1", width=320, height=100)
+        widget_frame = Frame(self.middleFrame, bg=color_fg, width=320, height=100)
         widget_frame.grid_propagate(0)
         widget_frame.grid_columnconfigure(0, weight=1)
         widget_frame.grid(padx=(padding, 0), pady=(0, 20), row=row, column=col)
-        widget_label = Label(widget_frame, bg="#c1c1c1", text=text, fg="blue", font=("Arial", 16))
+        widget_label = Label(widget_frame, bg=color_fg, text=text, fg=color_font, font=("Arial", 16))
         widget_label.config(pady=10)
         widget_label.grid()
-        widget_value = Label(widget_frame, bg="#c1c1c1", textvariable=variable, font=("Arial", 20))
+        widget_value = Label(widget_frame, bg=color_fg, textvariable=variable, font=("Arial", 20))
         widget_value.grid()
 
     # dummy data for GUI
@@ -108,8 +131,8 @@ class STPGround:
         self.longitude.set("77 02 W")
         self.gas1.set("77%")
         self.gas2.set("42%")
-        self.temperature.set("22C")
-        self.altitude.set("439ft")
+        self.temperature.set("22\u00b0C")
+        self.altitude.set("107m")
         self.graph.create_line(30, 200, 310, -50, 450, 100, fill="red", smooth=True)
         self.graph.create_oval(445, 95, 455, 105, fill="red")
 
@@ -117,7 +140,7 @@ class STPGround:
 # configures the root window of the application
 root = Tk()
 root.title("SSPL STP Ground Station")
-root.configure(bg="grey")
+root.configure(bg=color_bg)
 root.geometry("700x700")
 root.resizable(width=False, height=False)
 
