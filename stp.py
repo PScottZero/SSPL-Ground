@@ -3,6 +3,7 @@
 #
 # 24 September 2017
 from tkinter import *
+import serial
 
 # color themes for GUI
 
@@ -19,12 +20,12 @@ color_font = "#00007F"
 # red theme
 # color_bg = "#934C4C"
 # color_fg = "#A86F6F"
-# color_font = "#c1c1c1"
+# color_font = "#C1C1C1"
 
 # space theme
-# color_bg = "#5B669F"
-# color_fg = "#8C93BB"
-# color_font = "#5151CC"
+# color_bg = "#2D334F"
+# color_fg = "#424760"
+# color_font = "#00003F"
 
 
 # builds GUI elements
@@ -125,14 +126,32 @@ class STPGround:
         widget_value = Label(widget_frame, bg=color_fg, textvariable=variable, font=("Arial", 20))
         widget_value.grid()
 
+    # decodes data string
+    def decode(self, data_str):
+        split = data_str.split()
+        if len(split) < 6:
+            self.latitude.set("Error")
+            self.longitude.set("Error")
+            self.gas1.set("Error")
+            self.gas2.set("Error")
+            self.altitude.set("Error")
+            self.temperature.set("Error")
+        else:
+            self.latitude.set(split[0])
+            self.longitude.set(split[1])
+            self.altitude.set(split[2] + "m")
+            self.temperature.set(split[3] + "\u00b0C")
+            self.gas1.set(split[4] + "ppm")
+            self.gas2.set(split[5] + "ppm")
+
     # dummy data for GUI
     def dummy_data(self):
-        self.latitude.set("38 54 N")
-        self.longitude.set("77 02 W")
-        self.gas1.set("77%")
-        self.gas2.set("42%")
-        self.temperature.set("22\u00b0C")
-        self.altitude.set("107m")
+        self.latitude.set("40.79639")
+        self.longitude.set("-77.86790")
+        self.altitude.set("56.060m")
+        self.temperature.set("3.232\u00b0C")
+        self.gas1.set("407.060ppm")
+        self.gas2.set("306.225ppm")
         self.graph.create_line(30, 200, 310, -50, 450, 100, fill="red", smooth=True)
         self.graph.create_oval(445, 95, 455, 105, fill="red")
 
@@ -150,4 +169,20 @@ root.call("wm", "iconphoto", root, img)
 
 # assembles and runs GUI
 s = STPGround(root)
+ser = serial.Serial("COM3")
+ser.baudrate = 9600
+data = ""
+
+# only run this if using only GUI
 root.mainloop()
+
+# only run this part if arduino is connected
+# while True:
+#     x = ser.read().decode()
+#     if x == ';':
+#         s.decode(data)
+#         data = ""
+#     else:
+#         data += x
+#     root.update_idletasks()
+#     root.update()
