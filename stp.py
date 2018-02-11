@@ -3,29 +3,21 @@
 #
 # 24 September 2017
 from tkinter import *
+from datetime import datetime
 import serial
+import os
 
 # color themes for GUI
 
 # grey theme
-color_bg = "#6B6B6B"
-color_fg = "#9A9A9A"
-color_font = "#00007F"
-
-# blue theme
-# color_bg = "#367189"
-# color_fg = "#729bac"
+# color_bg = "#6B6B6B"
+# color_fg = "#9A9A9A"
 # color_font = "#00007F"
 
-# red theme
-# color_bg = "#934C4C"
-# color_fg = "#A86F6F"
-# color_font = "#C1C1C1"
-
-# space theme
-# color_bg = "#2D334F"
-# color_fg = "#424760"
-# color_font = "#00003F"
+# blue theme
+color_bg = "#367189"
+color_fg = "#729bac"
+color_font = "#00007F"
 
 
 # builds GUI elements
@@ -34,13 +26,22 @@ class STPGround:
     # initializer class
     def __init__(self, master):
 
+        self.row = 0
+        self.col = 0
+        self.pad = 0
+        self.count = 0
+        self.run = True
+
+        # file writing data
+        self.desktop = os.path.join(os.path.join(os.environ['HOMEPATH']), 'Desktop')
+        self.file = open(os.path.join(self.desktop, 'data.txt'), 'a')
+        self.error_file = open(os.path.join(self.desktop, 'error_data.txt'), 'a')
+
         # initializes upper and lower frames
         self.upperFrame = Frame(master, bg=color_bg)
         self.upperFrame.pack()
         self.middleFrame = Frame(master, bg=color_bg)
         self.middleFrame.pack(anchor="w", padx=20, pady=(30, 0))
-        self.lowerFrame = Frame(master, bg=color_bg)
-        self.lowerFrame.pack(anchor="w", padx=20)
 
         # initializes logo for upper frame
         self.logo = PhotoImage(file="logo.png")
@@ -48,119 +49,167 @@ class STPGround:
         self.logoLabel.image = self.logo
         self.logoLabel.pack()
 
-        # latitude cell
-        self.latitude = StringVar()
-        self.widget_creator(self.latitude, "Latitude:", 0, 0, 0)
-
-        # longitude cell
-        self.longitude = StringVar()
-        self.widget_creator(self.longitude, "Longitude:", 20, 0, 1)
-
-        # gas 1 concentration cell
-        self.gas1 = StringVar()
-        self.widget_creator(self.gas1, "Gas 1 Concentration:", 0, 1, 0)
-
-        # gas 2 concentration cell
-        self.gas2 = StringVar()
-        self.widget_creator(self.gas2, "Gas 2 Concentration:", 20, 1, 1)
-
-        # temperature cell
-        self.temperature = StringVar()
-        self.widget_creator(self.temperature, "Temperature:", 0, 2, 0)
+        # timestamp cell
+        self.timestamp = StringVar()
+        self.widget_creator(self.timestamp, "Time Stamp:")
 
         # altitude cell
         self.altitude = StringVar()
-        self.widget_creator(self.altitude, "Altitude:", 20, 2, 1)
+        self.widget_creator(self.altitude, "Altitude:")
 
-        # altitude graph (dummy data)
-        self.graph = Canvas(self.lowerFrame, width=660, height=230, bg="white", borderwidth=0, highlightthickness=0)
+        # latitude cell
+        self.latitude = StringVar()
+        self.widget_creator(self.latitude, "Latitude:")
 
-        # vertical axis (height meters)
-        self.graph.create_line(30, 0, 30, 200)
-        self.graph.create_line(30, 200, 660, 200)
-        self.graph.create_line(0, 230, 30, 200)
-        self.graph.create_line(30, 150, 35, 150)
-        self.graph.create_line(30, 100, 35, 100)
-        self.graph.create_line(30, 50, 35, 50)
-        self.graph.create_text(15, 20, text="m")
-        self.graph.create_text(15, 50, text="150")
-        self.graph.create_text(15, 100, text="100")
-        self.graph.create_text(15, 150, text="50")
-        self.graph.create_text(15, 200, text="0")
+        # longitude cell
+        self.longitude = StringVar()
+        self.widget_creator(self.longitude, "Longitude:")
 
-        # horizontal axis (time seconds)
-        self.graph.create_line(100, 200, 100, 195)
-        self.graph.create_line(170, 200, 170, 195)
-        self.graph.create_line(240, 200, 240, 195)
-        self.graph.create_line(310, 200, 310, 195)
-        self.graph.create_line(380, 200, 380, 195)
-        self.graph.create_line(450, 200, 450, 195)
-        self.graph.create_line(520, 200, 520, 195)
-        self.graph.create_line(590, 200, 590, 195)
-        self.graph.create_text(30, 215, text="0")
-        self.graph.create_text(100, 215, text="15")
-        self.graph.create_text(170, 215, text="30")
-        self.graph.create_text(240, 215, text="45")
-        self.graph.create_text(310, 215, text="60")
-        self.graph.create_text(380, 215, text="75")
-        self.graph.create_text(450, 215, text="90")
-        self.graph.create_text(520, 215, text="100")
-        self.graph.create_text(590, 215, text="120")
-        self.graph.create_text(630, 215, text="sec")
+        # temperature cell
+        self.temperature = StringVar()
+        self.widget_creator(self.temperature, "Temperature:")
 
-        self.graph.create_text(600, 15, text="Altitude Graph", font=("Arial", 12))
-        self.graph.pack()
+        # acceleration x cell
+        self.accX = StringVar()
+        self.widget_creator(self.accX, "Acceleration X:")
+
+        # acceleration y cell
+        self.accY = StringVar()
+        self.widget_creator(self.accY, "Acceleration Y:")
+
+        # acceleration z cell
+        self.accZ = StringVar()
+        self.widget_creator(self.accZ, "Acceleration Z:")
+
+        # acceleration z cell
+        self.voltage = StringVar()
+        self.widget_creator(self.voltage, "Voltage Draw:")
+
+        # acceleration z cell
+        self.uv = StringVar()
+        self.widget_creator(self.uv, "UV Index:")
+
+        # acceleration z cell
+        self.ejection = StringVar()
+        self.widget_creator(self.ejection, "Ejection Charge:")
+
+        # gas 1 concentration cell
+        self.gas1 = StringVar()
+        self.widget_creator(self.gas1, "Alcohol Concentration:")
+
+        # gas 2 concentration cell
+        self.gas2 = StringVar()
+        self.widget_creator(self.gas2, "Humidity:")
+
+        # connection status cell
+        self.connection = StringVar()
+        self.widget_creator(self.connection, "Connection Status:")
 
         # sets dummy data
         self.dummy_data()
 
     # creates data cells
-    def widget_creator(self, variable, text, padding, row, col):
-        widget_frame = Frame(self.middleFrame, bg=color_fg, width=320, height=100)
+    def widget_creator(self, variable, text):
+        widget_frame = Frame(self.middleFrame, bg=color_fg, width=220, height=65)
         widget_frame.grid_propagate(0)
         widget_frame.grid_columnconfigure(0, weight=1)
-        widget_frame.grid(padx=(padding, 0), pady=(0, 20), row=row, column=col)
-        widget_label = Label(widget_frame, bg=color_fg, text=text, fg=color_font, font=("Arial", 16))
-        widget_label.config(pady=10)
+        widget_frame.grid(padx=(self.pad, 0), pady=(0, 20), row=self.row, column=self.col)
+        widget_label = Label(widget_frame, bg=color_fg, text=text, fg=color_font, font=("Arial", 12, "italic"))
+        widget_label.config(pady=2)
         widget_label.grid()
-        widget_value = Label(widget_frame, bg=color_fg, textvariable=variable, font=("Arial", 20))
+        widget_value = Label(widget_frame, bg=color_fg, textvariable=variable, font=("Arial", 16))
         widget_value.grid()
 
+        if self.count % 2 == 0:
+            self.pad = 20
+            self.col = 1
+        else:
+            self.pad = 0
+            self.row += 1
+            self.col = 0
+        self.count += 1
+
     # decodes data string
-    def decode(self, data_str):
-        split = data_str.split()
-        if len(split) < 6:
+    def set_data(self, data_str):
+        split = data_str.split(",")
+        if len(split) != 13:
+            self.timestamp.set("Error")
             self.latitude.set("Error")
             self.longitude.set("Error")
-            self.gas1.set("Error")
-            self.gas2.set("Error")
             self.altitude.set("Error")
             self.temperature.set("Error")
+            self.accX.set("Error")
+            self.accY.set("Error")
+            self.accZ.set("Error")
+            self.voltage.set("Error")
+            self.uv.set("Error")
+            self.ejection.set("Error")
+            self.gas1.set("Error")
+            self.gas2.set("Error")
+            self.error_file.write(data_str)
         else:
-            self.latitude.set(split[0])
-            self.longitude.set(split[1])
-            self.altitude.set(split[2] + "m")
-            self.temperature.set(split[3] + "\u00b0C")
-            self.gas1.set(split[4] + "ppm")
-            self.gas2.set(split[5] + "ppm")
+            if split[0].find("\n") != -1:
+                split[0] = split[0][2:]
+            self.timestamp.set(split[0])
+            self.latitude.set(split[1])
+            self.longitude.set(split[2])
+            self.altitude.set(split[3] + "m")
+            self.temperature.set(split[4] + "\u00b0C")
+            self.accX.set(split[5] + "m/2\u00b2")
+            self.accY.set(split[6] + "m/2\u00b2")
+            self.accZ.set(split[7] + "m/2\u00b2")
+            self.voltage.set(split[8] + "V")
+            self.uv.set(split[9])
+            self.ejection.set(split[10])
+            self.gas1.set(split[11])
+            self.gas2.set(split[12] + "%")
+            self.file.write(data_str)
+
+    # properly ends python window
+    def on_close(self):
+        self.file.close()
+        self.error_file.close()
+        self.run = False
+        root.destroy()
 
     # dummy data for GUI
     def dummy_data(self):
+        self.timestamp.set(datetime.now().strftime("%H:%M:%S"))
+        self.altitude.set("56.060m")
         self.latitude.set("40.79639")
         self.longitude.set("-77.86790")
-        self.altitude.set("56.060m")
         self.temperature.set("3.232\u00b0C")
-        self.gas1.set("407.060ppm")
-        self.gas2.set("306.225ppm")
-        self.graph.create_line(30, 200, 310, -50, 450, 100, fill="red", smooth=True)
-        self.graph.create_oval(445, 95, 455, 105, fill="red")
+        self.accX.set("3.211m/s\u00b2")
+        self.accY.set("5.409m/s\u00b2")
+        self.accZ.set("10.652m/s\u00b2")
+        self.voltage.set("4.955V")
+        self.uv.set("3.2")
+        self.ejection.set("False")
+        self.gas1.set("407.060")
+        self.gas2.set("22%")
+        self.connection.set("Dummy Data")
+
+    # sets all data to null (None)
+    def null_data(self):
+        self.timestamp.set(datetime.now().strftime("%H:%M:%S"))
+        self.altitude.set(None)
+        self.latitude.set(None)
+        self.longitude.set(None)
+        self.temperature.set(None)
+        self.accX.set(None)
+        self.accY.set(None)
+        self.accZ.set(None)
+        self.voltage.set(None)
+        self.uv.set(None)
+        self.ejection.set(None)
+        self.gas1.set(None)
+        self.gas2.set(None)
 
 
 # configures the root window of the application
 root = Tk()
 root.title("SSPL STP Ground Station")
 root.configure(bg=color_bg)
-root.geometry("700x700")
 root.resizable(width=False, height=False)
 
 # image icon for application
@@ -169,20 +218,29 @@ root.call("wm", "iconphoto", root, img)
 
 # assembles and runs GUI
 s = STPGround(root)
-ser = serial.Serial("COM3")
-ser.baudrate = 9600
-data = ""
+root.protocol('WM_DELETE_WINDOW', s.on_close)
 
-# only run this if using only GUI
-root.mainloop()
+# PySerial Initialization
+try:
+    root.update()
+    ser = serial.Serial("COM3")  # set serial port here
+    ser.baudrate = 9600
+    data = ""
+    data_strings = []
+    s.connection.set("Connected")
+    s.null_data()
+    while s.run:
+        root.update_idletasks()
+        root.update()
+        x = ser.read().decode()
+        if x == ';':
+            s.set_data(data)
+            data = ""
+        else:
+            data += x
 
-# only run this part if arduino is connected
-# while True:
-#     x = ser.read().decode()
-#     if x == ';':
-#         s.decode(data)
-#         data = ""
-#     else:
-#         data += x
-#     root.update_idletasks()
-#     root.update()
+except serial.SerialException:
+    s.connection.set("No Connection")
+    s.null_data()
+    # s.dummy_data()
+    root.mainloop()
