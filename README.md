@@ -1,7 +1,5 @@
 # STP Ground Station
 
-This is where all code for the STP ground station group will go. Code here will include GUI code [Python], Arduino code [C], and all other code.
+This is the code for the STP Ground Station. All functionalities of the code are descibed in the comments in the code.
 
-Currently, only the GUI is hosted here. Once hardware experimentation begins, more code will be added.
-
-*** GUI REQUIRES PYSERIAL TO READ FROM ARDUINO
+NOTE: PySerial is required for the code to work properly. https://pypi.python.org/pypi/pyserial
